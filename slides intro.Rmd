@@ -1,0 +1,672 @@
+---
+title: "Introduction to R"
+subtitle: "⚔<br/>with xaringan"
+author: "Antonio Rodriguez Andres"
+institute: "RStudio, Inc."
+date: "2019/08/29 (updated: `r Sys.Date()`)"
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+.center[
+
+![My image](https://upload.wikimedia.org/wikipedia/commons/b/be/Sharingan_triple.svg)
+
+.caption[
+]
+
+]
+---
+class: inverse, center, middle
+
+# Get Started
+
+---
+class: inverse, center, middle
+# Some preliminaries
+
+---
+class: inverse, center, middle
+
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+library(knitr)
+opts_chunk$set(
+  fig.align="center",  
+  fig.height=4, #fig.width=6,
+  # out.width="748px", #out.length="520.75px",
+  dpi=300, #fig.path='Figs/',
+  cache=T#, echo=F, warning=F, message=F
+  )
+library(tidyverse)
+library(hrbrthemes)
+```
+
+---
+# Table of contents
+
+- Motivation
+
+- R basics
+
+- Data visualization
+
+- Having fun with modelling
+
+- Some tips for data R newbies
+
+
+---
+
+---
+
+# Why this course?
+
+Fill in the gaps left by traditional econometrics and methods classes using less flexible econometrics and statistical packages.
+
+- Practical skills that tools that will benefit your dissertation (master or doctoral) and future professional career.
+- Neglected skills like how to actually find datasets in the wild and clean them.
+
+Data science skills are largely distinct from (and complementary to) the core 'metrics oeuvre familiar to economists.
+
+- Data viz, cleaning and wrangling; machine learning basics
+
+---
+# At the end of this session
+
+
+![](https://media.giphy.com/media/dkGhBWE3SyzXW/giphy.gif)
+
+---
+
+
+---
+
+# Software installation and registration
+
+1. Download [R](https://www.r-project.org/).
+
+2. Download [RStudio](https://www.rstudio.com/products/rstudio/download/preview/).
+
+---
+class: inverse, center, middle
+name: r4ds
+
+# R and RStudio
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=796px></html>
+
+---
+
+# Why R and RStudio? (cont.)
+```{R, indeeddotcom, echo = F, fig.height = 6, fig.width = 9, dev = "svg"}
+# The popularity data
+pop_df <- 
+  data.frame(
+  lang = c("SQL", "Python", "R", "SAS", "Matlab", "SPSS", "Stata"),
+  n_jobs = c(107130, 66976, 48772, 25644, 11464, 3717, 1624),
+  free = c(T, T, T, F, F, F, F)
+  )
+## Plot it
+pop_df %>% 
+  mutate(lang = lang %>% factor(ordered = T)) %>%
+  ggplot(aes(x = lang, y = n_jobs, fill = free)) +
+  geom_col() +
+  geom_hline(yintercept = 0) +
+  aes(x = reorder(lang, -n_jobs), fill = reorder(free, -free)) +
+  xlab("Statistical language") +
+  scale_y_continuous(label = scales::comma) +
+  ylab("Number of jobs") +
+  labs(
+    title = "Comparing statistical languages",
+    subtitle = "Number of job postings on Indeed.com, 2019/01/06"
+    ) +
+  scale_fill_manual(
+    "Free?",
+    labels = c("True", "False"),
+    values = c("#f92672", "darkslategray")
+    ) +
+  ggthemes::theme_pander(base_size = 17) +
+  # theme_ipsum() +
+  theme(legend.position = "bottom")
+```
+
+---
+
+# Why R and RStudio? (cont.)
+
+### Data science positivism
+
+- Alongside Python, R has become the *de facto* language for data science.
+  - See: [*The Impressive Growth of R*](https://stackoverflow.blog/2017/10/10/impressive-growth-r/), [*The Popularity of Data Science Software*](http://r4stats.com/articles/popularity/)
+- Open-source (free!) with a global user-base spanning academia and industry.
+  - "Do you want to be a profit source or a cost center?"
+
+### Bridge to applied economics and other tools
+
+- Already has all of the statistics and econometrics support, and is amazingly adaptable as a “glue” language to other
+programming languages and APIs.
+- The RStudio IDE and ecosystem allow for further, seemless integration.
+
+---
+
+
+
+---
+
+# R vs Stata
+
+If you're coming from Stata, some additional things worth emphasizing:
+
+- Multiple objects (e.g. data frames) can exist happily in the same workspace. 
+   - No more `keep`, `preserve`, `restore` hackery.
+   - This is a direct consequence of the OOP approach.
+
+- You will load packages at the start of every new R session. Make peace with this.
+  - "Base" R comes with tons of useful in-built functions. It also provides all the tools necessary for you to write your own functions. 
+  - However, many of R's best data science functions and tools come from external packages written by other users.
+  
+---
+# R vs Stata (cont..)
+
+
+- R easily and infinitely parallelizes. For free.
+  - Compare the cost of a [Stata/MP](https://www.stata.com/statamp/) license, nevermind the fact that you effectively pay per core...
+
+- You don't need to `tset or xtset` your data. (Although you can too.)
+
+---
+
+# R code example (linear regression)
+
+```{r}
+fit = lm(dist ~ 1 + speed, data = cars)
+summary(fit)
+```
+
+---
+
+# Examples using ggplot2
+
+```{r gapm_plot, dev="svg"}
+library(ggplot2)
+library(gapminder) ## For the gapminder data
+ggplot(data = gapminder, mapping = aes(x = gdpPercap, y = lifeExp)) + 
+  geom_point()
+```
+
+---
+
+# Some R basics
+
+1. Everything is an object.
+
+2. Everything has a name.
+
+3. You do things using functions.
+
+4. Functions come pre-written in packages (i.e. "libraries"), although you can — and should — write your own functions too.
+
+--
+
+</br>
+
+Points 1. and 2. can be summarised as an [object-orientated programming](https://en.wikipedia.org/wiki/Object-oriented_programming) (OOP) approach.
+  - This may sound super abstract now, but we'll see *lots* of examples over the coming weeks that will make things clear.
+
+---
+
+# Tidyverse world: Tidy data
+
+Resources:
+- Paper: [*Tidy Data*](https://vita.had.co.nz/papers/tidy-data.pdf) (Hadley Wickham, 2014 JSS)
+- Vignette: [Tidy data](https://cran.r-project.org/web/packages/tidyr/vignettes/tidy-data.html) (from the `tidyr` package)
+
+Key points:
+1. Each variable forms a column.
+2. Each observation forms a row.
+3. Each type of observational unit forms a table.
+
+--
+
+</br>
+
+Basically, tidy data is more likely to be [long (i.e. narrow) format](https://en.wikipedia.org/wiki/Wide_and_narrow_data) than wide format.
+
+---
+
+# Checklist
+
+☑ You should already have installed the [tidyverse](https://www.tidyverse.org/) last week.
+
+☑ You will also need the [nycflights13](hhttps://github.com/hadley/nycflights13) package.
+- Install it now: `install.packages("nycflights13")`
+
+--
+
+</br>
+
+Today is the last lecture where I'll be using slides (i.e. "forcing" you to type out commands by hand).
+- I've also included an HTML document version of these slides, since I think these will be easier to use a reference going forward (scrolling and so forth). Look inside the `html_document/` sub-directory.  
+- From next lecture on we'll be switching to HMTL documents entirely, but I still encourage you to avoid copy+paste as much as possible.
+
+---
+class: inverse, center, middle
+name: basics
+
+# Tidyverse basics
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=796px></html>
+
+---
+
+# Tidyverse vs. base R
+
+Much digital ink has been spilled over the "tidyverse vs. base R" debate.
+
+--
+
+I won't delve into this debate here, because I think the answer is [obvious](http://varianceexplained.org/r/teach-tidyverse/): We should teach (and learn) the tidyverse first.
+- The documentation and community support are outstanding.
+- Having a consistent philosophy and syntax makes it much easier to learn.
+- For data cleaning, wrangling and plotting... the tidyverse is really a no-brainer.<sup>1</sup>
+
+.footnote[
+<sup>1</sup> I should say that I'm also a fan of the [data.table](https://github.com/Rdatatable/data.table/wiki) package for data work. I may come back to this package once we reach the big data section of the course.
+]
+
+--
+
+But this certainly shouldn't put you off learning base R alternatives.
+- Base R is extremely flexible and powerful (esp. when combined with other libraries).
+- There are some things that you'll have to venture outside of the tidyverse for.
+- A combination of tidyverse and base R is often the best solution to a problem.
+
+---
+
+# Tidyverse vs. base R (cont.)
+
+One point of convenience is that there is often a direct correspondence between a tidyverse command and its base R equivalent. 
+
+These invariably follow a `tidyverse::snake_case` vs `base::period.case` rule. E.g. see:
+- `?readr::read_csv` vs `?utils::read.csv`
+- `?tibble::data_frame`vs `?base::data.frame`
+- `?dplyr::if_else` vs `?base::ifelse`
+- etc.
+  
+If you call up the above examples, you'll see that the tidyverse alternative typically offers some enhancements or other useful options (and sometimes restrictions) over its base counterpart.
+- Remember: There are always many ways to achieve a single goal in R.
+
+---
+
+# Tidyverse packages
+
+Let's load the tidyverse meta-package and check the output.
+```{r tverse}
+library(tidyverse)
+```
+
+--
+
+We see that we have actually loaded a number of packages (which could also be loaded individually): `ggplot2`, `tibble`, `dplyr`, etc.
+- We can also see information about the package versions and some namespace conflicts (remember those from last week).
+
+---
+
+# Tidyverse packages (cont.)
+
+The tidyverse actually comes with a lot more packages than those that are just loaded automatically.<sup>1</sup>
+```{r tverse_pkgs}
+tidyverse_packages()
+```
+
+We'll use several of these additional packages during the remainder of this course.
+— E.g. The `lubridate` package for working with dates and the `rvest` package for webscraping.
+- However, bear in mind that these packages will have to be loaded separately.
+
+.footnote[
+<sup>1</sup> It also includes a lot of dependencies upon installation.
+]
+
+---
+
+# Tidyverse packages (cont.)
+
+I hope to cover most of the tidyverse packages over the length of this course.
+
+Today, however, I'm only really going to focus on two packages: 
+1. `dplyr`
+2. `tidyr`
+
+These are the workhorse packages for cleaning and wrangling data. They are thus the ones that you will likely make the most use of (alongside `ggplot2`, which we already met back in Lecture 1).
+- Data cleaning and wrangling occupies an inordinate amount of time, no matter where you are in your research career.
+
+---
+
+# An aside on pipes: %>%
+
+We already learned about pipes in our lecture on the bash shell. In R, the pipe operator is denoted `%>%` and is automatically loaded with the tidyverse.
+  
+I want to reiterate how cool pipes are, and how using them can dramatically improve the experience of reading and writing code. Compare:
+
+```{r, eval = F}
+## These next two lines of code do exactly the same thing.
+mpg %>% filter(manufacturer=="audi") %>% group_by(model) %>% summarise(hwy_mean = mean(hwy))
+summarise(group_by(filter(mpg, manufacturer=="audi"), model), hwy_mean = mean(hwy))
+```
+
+--
+
+The first line reads from left to right, exactly how I thought of the operations in my head. 
+- Take this object (mpg), do this (filter), then do this (group by), etc.
+
+The second line totally inverts this logical order (the final operation comes first!) 
+- Who wants to read things inside out?
+
+---
+
+# An aside on pipes: %>% (cont.)
+
+The piped version of the code is even more readable if we write it over several lines. Here it is again and, this time, I'll run it for good measure so you can see the output:
+
+```{r pipe}
+mpg %>% 
+  filter(manufacturer=="audi") %>% 
+  group_by(model) %>% 
+  summarise(hwy_mean = mean(hwy))
+```
+
+Remember: Using vertical space costs nothing and makes for much more readable/writeable code than cramming things horizontally.
+
+--
+
+PS — The pipe is originally from the [magrittr](https://magrittr.tidyverse.org/) package ([geddit?](https://en.wikipedia.org/wiki/The_Treachery_of_Images)), which can do some other cool things if you're inclined to explore.
+
+
+---
+class: inverse, center, middle
+name: dplyr
+
+# dplyr
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=796px></html>
+
+---
+
+# Key dplyr verbs
+
+There are five key dplyr verbs that you need to learn.
+
+1. `filter()`: Filter (i.e. subset) rows based on their values.
+
+2. `arrange()`: Arrange (i.e. reorder) rows based on their values.
+
+3. `select()`: Select (i.e. subset) columns by their names: 
+
+4. `mutate()`: Create new columns.
+
+5. `summarise()`: Collapse multiple rows into a single summary value.<sup>1</sup>
+
+.footnote[
+<sup>1</sup> `summarize()` with a "z" works too. R doesn't discriminate against uncivilised nations of the world.
+]
+
+--
+
+</br>
+
+Let's practice these commands together using the starwars data frame that comes pre-packaged with `dplyr`. 
+
+---
+
+# 1) dplyr::filter()
+
+We can chain multiple filter commands with the pipe (`%>%`), or just separate them within a single filter command using commas.
+```{r filter1}
+starwars %>% 
+  filter( 
+    species == "Human", 
+    height >= 190
+    ) 
+```
+
+---
+
+# 1) dplyr::filter() *cont.*
+
+Regular expressions work well too.
+```{r filter2}
+starwars %>% 
+  filter(grepl("Skywalker", name))
+```
+
+---
+
+# 1) dplyr::filter() *cont.*
+
+A very common `filter()` use case is identifying (or removing) missing data cases. 
+```{r filter3}
+starwars %>% 
+  filter(is.na(height))
+```
+
+--
+
+</br>
+
+To remove missing observations, simply use negation: `filter(!is.na(height))`. Try this yourself.
+
+---
+
+# 2) dplyr::arrange()
+
+```{r arrange1}
+starwars %>% 
+  arrange(birth_year)
+```
+
+--
+
+*Note.* Arranging on a character-based column (i.e. strings) will sort alphabetically. Try this yourself by arranging according to the "name" column.
+
+---
+
+# 2) dplyr::arrange() *cont.*
+
+We can also arrange items in descending order using `arrange(desc())`.
+```{r arrange2}
+starwars %>% 
+  arrange(desc(birth_year))
+```
+
+---
+
+# 3) dplyr::select()
+
+Use commas to select multiple columns out of a data frame. (You can also use "first:last" for consecutive columns). Deselect a column with "-".
+```{r select1}
+starwars %>% 
+  select(name:skin_color, species, -height)
+```
+
+---
+
+# 3) dplyr::select() *cont.*
+
+You can also rename some (or all) of your selected variables in place.
+```{r select2}
+starwars %>%
+  select(alias=name, crib=homeworld, sex=gender) 
+```
+
+---
+
+# 3) dplyr::select() *cont.*
+
+The `select(contains(PATTERN))` option provides a nice shortcut in relevant cases.
+```{r select3}
+starwars %>% 
+  select(name, contains("color"))
+```
+
+---
+
+# 3) dplyr::select() *cont.*
+
+The `select(..., everything())` option is another useful shortcut if you only want to bring some variable(s) to the "front" of a data frame.
+
+```{r select4}
+starwars %>% 
+  select(species, homeworld, everything())
+```
+
+---
+
+# 4) dplyr::mutate()
+
+You can create new columns from scratch, or (more commonly) as transformations of existing columns.
+```{r mutate1}
+starwars %>% 
+  select(name, birth_year) %>%
+  mutate(dog_years = birth_year * 7) %>%
+  mutate(comment = paste0(name, " is ", dog_years, " in dog years."))
+```
+
+---
+
+
+# 4) dplyr::mutate() *cont*
+
+*Note:* `mutate()` is order aware. So you can chain multiple mutates in a single call.
+```{r mutate2}
+starwars %>% 
+  select(name, birth_year) %>%
+  mutate(
+    dog_years = birth_year * 7, ## Separate with a comma
+    comment = paste0(name, " is ", dog_years, " in dog years.")
+    )
+```
+
+---
+
+# 4) dplyr::mutate() *cont.*
+
+Boolean, logical and conditional operators all work well with `mutate()` too.
+```{r mutate3}
+starwars %>% 
+  select(name, height) %>%
+  filter(name %in% c("Luke Skywalker", "Anakin Skywalker")) %>% 
+  mutate(tall1 = height > 180) %>%
+  mutate(tall2 = ifelse(height > 180, "Tall", "Short")) ## Same effect, but can choose labels
+
+```
+
+---
+
+# 4) dplyr::mutate() *cont.*
+
+Lastly, there are "scoped" variants of `mutate()` that work on a subset of variables.
+- `mutate_all()` affects every variable
+- `mutate_at()` affects named or selected variables
+- `mutate_if()` affects variables that meet some criteria (e.g. are numeric)
+
+A silly example using the latter:
+
+```{r, mutate4}
+starwars %>% select(name:eye_color) %>% mutate_if(is.character, toupper) %>% head(5)
+```
+
+--
+
+See `?mutate_all` for more details and examples.
+
+---
+
+# 5) dplyr::summarise()
+
+Particularly useful in combination with the `group_by()` command.
+```{r summ1}
+starwars %>% 
+  group_by(species, gender) %>% 
+  summarise(mean_height = mean(height, na.rm = T))
+```
+
+---
+
+# 5) dplyr::summarise() *cont.*
+
+Note that including "na.rm = T" is usually a good idea with summarise functions. Otherwise, any missing value will propogate to the summarised value too.
+```{r summ2}
+## Probably not what we want
+starwars %>% 
+  summarise(mean_height = mean(height))
+## Much better
+starwars %>% 
+  summarise(mean_height = mean(height, na.rm = T))
+```
+
+---
+
+# 4) dplyr::summarise() *cont.*
+
+The "scoped" variants that we saw earlier also work with `summarise()`
+- `summarise_all()` affects every variable
+- `summarise_at()` affects named or selected variables
+- `summarise_if()` affects variables that meet some criteria (e.g. are numeric)
+
+An example using the latter:
+
+```{r, summ4}
+starwars %>% group_by(species, gender) %>% summarise_if(is.numeric, funs(avg=mean), na.rm=T) %>% head(5)
+```
+
+--
+
+Again, see `?summarise_at` for more details and examples.
+
+---
+
+# Other dplyr goodies
+
+`group_by()` and `ungroup()`: For (un)grouping.
+- Particularly useful with the `summarise()` and `mutate()` commands, as we've already seen.
+
+--
+
+`slice()`: Subset rows by position rather than filtering by values.
+- E.g. `starwars %>% slice(c(1, 5))`
+
+--
+
+`pull()`: Extract a column from as a data frame as a vector or scalar.
+- E.g. `starwars %>% filter(gender=="female") %>% pull(height)`
+
+--
+
+`count()` and `distinct()`: Number and isolate unique observations.
+- E.g. `starwars %>% count(species)`, or `starwars %>% distinct(species)`
+- You could also use a combination of `mutate()`, `group_by()`, and `n()`, e.g. `starwars %>% group_by(species) %>% mutate(num = n())`.
+
+
+---
+
+# Other dplyr goodies (cont.)
+
+There are also a whole class of [window functions](https://cran.r-project.org/web/packages/dplyr/vignettes/window-functions.html) for getting leads and lags, ranking, creating cumulative aggregates, etc.
+- See `vignette("window-functions")`.
+
+---
+
+# Data visualization using ggplot
+
+---
+
+# Many Thanks!
+
+Slides created via the R package [**xaringan**](https://github.com/yihui/xaringan).
+
+The chakra comes from [remark.js](https://remarkjs.com), [**knitr**](http://yihui.name/knitr), and [R Markdown](https://rmarkdown.rstudio.com).

@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+  <head>
+    <title>Introduction to R</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Antonio Rodriguez Andres" />
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link href="libs/remark-css/default-fonts.css" rel="stylesheet" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Introduction to R
+## ⚔<br/>with xaringan
+### Antonio Rodriguez Andres
+### RStudio, Inc.
+### 2019/08/29 (updated: 2019-08-29)
+
+---
+
+.center[
+
+![My image](https://upload.wikimedia.org/wikipedia/commons/b/be/Sharingan_triple.svg)
+
+.caption[
+]
+
+]
+---
+class: inverse, center, middle
+
+# Get Started
+
+---
+class: inverse, center, middle
+# Some preliminaries
+
+---
+class: inverse, center, middle
+
+
+
+
+---
+# Table of contents
+
+- Motivation
+
+- R basics
+
+- Data visualization
+
+- Having fun with modelling
+
+- Some tips for data R newbies
+
+
+---
+
+---
+
+# Why this course?
+
+Fill in the gaps left by traditional econometrics and methods classes using less flexible econometrics and statistical packages.
+
+- Practical skills that tools that will benefit your dissertation (master or doctoral) and future professional career.
+- Neglected skills like how to actually find datasets in the wild and clean them.
+
+Data science skills are largely distinct from (and complementary to) the core 'metrics oeuvre familiar to economists.
+
+- Data viz, cleaning and wrangling; machine learning basics
+
+---
+# At the end of this session
+
+
+![](https://media.giphy.com/media/dkGhBWE3SyzXW/giphy.gif)
+
+---
+
+
+---
+
+# Software installation and registration
+
+1. Download [R](https://www.r-project.org/).
+
+2. Download [RStudio](https://www.rstudio.com/products/rstudio/download/preview/).
+
+---
+class: inverse, center, middle
+name: r4ds
+
+# R and RStudio
+&lt;html&gt;&lt;div style='float:left'&gt;&lt;/div&gt;&lt;hr color='#EB811B' size=1px width=796px&gt;&lt;/html&gt;
+
+---
+
+# Why R and RStudio? (cont.)
+&lt;img src="slides-intro_files/figure-html/indeeddotcom-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Why R and RStudio? (cont.)
+
+### Data science positivism
+
+- Alongside Python, R has become the *de facto* language for data science.
+  - See: [*The Impressive Growth of R*](https://stackoverflow.blog/2017/10/10/impressive-growth-r/), [*The Popularity of Data Science Software*](http://r4stats.com/articles/popularity/)
+- Open-source (free!) with a global user-base spanning academia and industry.
+  - "Do you want to be a profit source or a cost center?"
+
+### Bridge to applied economics and other tools
+
+- Already has all of the statistics and econometrics support, and is amazingly adaptable as a “glue” language to other
+programming languages and APIs.
+- The RStudio IDE and ecosystem allow for further, seemless integration.
+
+---
+
+
+
+---
+
+# R vs Stata
+
+If you're coming from Stata, some additional things worth emphasizing:
+
+- Multiple objects (e.g. data frames) can exist happily in the same workspace. 
+   - No more `keep`, `preserve`, `restore` hackery.
+   - This is a direct consequence of the OOP approach.
+
+- You will load packages at the start of every new R session. Make peace with this.
+  - "Base" R comes with tons of useful in-built functions. It also provides all the tools necessary for you to write your own functions. 
+  - However, many of R's best data science functions and tools come from external packages written by other users.
+  
+---
+# R vs Stata (cont..)
+
+
+- R easily and infinitely parallelizes. For free.
+  - Compare the cost of a [Stata/MP](https://www.stata.com/statamp/) license, nevermind the fact that you effectively pay per core...
+
+- You don't need to `tset or xtset` your data. (Although you can too.)
+
+---
+
+# R code example (linear regression)
+
+
+```r
+fit = lm(dist ~ 1 + speed, data = cars)
+summary(fit)
+```
+
+```
+## 
+## Call:
+## lm(formula = dist ~ 1 + speed, data = cars)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -29.069  -9.525  -2.272   9.215  43.201 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) -17.5791     6.7584  -2.601   0.0123 *  
+## speed         3.9324     0.4155   9.464 1.49e-12 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 15.38 on 48 degrees of freedom
+## Multiple R-squared:  0.6511,	Adjusted R-squared:  0.6438 
+## F-statistic: 89.57 on 1 and 48 DF,  p-value: 1.49e-12
+```
+
+---
+
+# Examples using ggplot2
+
+
+```r
+library(ggplot2)
+library(gapminder) ## For the gapminder data
+ggplot(data = gapminder, mapping = aes(x = gdpPercap, y = lifeExp)) + 
+  geom_point()
+```
+
+&lt;img src="slides-intro_files/figure-html/gapm_plot-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Some R basics
+
+1. Everything is an object.
+
+2. Everything has a name.
+
+3. You do things using functions.
+
+4. Functions come pre-written in packages (i.e. "libraries"), although you can — and should — write your own functions too.
+
+--
+
+&lt;/br&gt;
+
+Points 1. and 2. can be summarised as an [object-orientated programming](https://en.wikipedia.org/wiki/Object-oriented_programming) (OOP) approach.
+  - This may sound super abstract now, but we'll see *lots* of examples over the coming weeks that will make things clear.
+
+---
+
+# Tidyverse world: Tidy data
+
+Resources:
+- Paper: [*Tidy Data*](https://vita.had.co.nz/papers/tidy-data.pdf) (Hadley Wickham, 2014 JSS)
+- Vignette: [Tidy data](https://cran.r-project.org/web/packages/tidyr/vignettes/tidy-data.html) (from the `tidyr` package)
+
+Key points:
+1. Each variable forms a column.
+2. Each observation forms a row.
+3. Each type of observational unit forms a table.
+
+--
+
+&lt;/br&gt;
+
+Basically, tidy data is more likely to be [long (i.e. narrow) format](https://en.wikipedia.org/wiki/Wide_and_narrow_data) than wide format.
+
+---
+
+# Checklist
+
+☑ You should already have installed the [tidyverse](https://www.tidyverse.org/) last week.
+
+☑ You will also need the [nycflights13](hhttps://github.com/hadley/nycflights13) package.
+- Install it now: `install.packages("nycflights13")`
+
+--
+
+&lt;/br&gt;
+
+Today is the last lecture where I'll be using slides (i.e. "forcing" you to type out commands by hand).
+- I've also included an HTML document version of these slides, since I think these will be easier to use a reference going forward (scrolling and so forth). Look inside the `html_document/` sub-directory.  
+- From next lecture on we'll be switching to HMTL documents entirely, but I still encourage you to avoid copy+paste as much as possible.
+
+---
+class: inverse, center, middle
+name: basics
+
+# Tidyverse basics
+
+&lt;html&gt;&lt;div style='float:left'&gt;&lt;/div&gt;&lt;hr color='#EB811B' size=1px width=796px&gt;&lt;/html&gt;
+
+---
+
+# Tidyverse vs. base R
+
+Much digital ink has been spilled over the "tidyverse vs. base R" debate.
+
+--
+
+I won't delve into this debate here, because I think the answer is [obvious](http://varianceexplained.org/r/teach-tidyverse/): We should teach (and learn) the tidyverse first.
+- The documentation and community support are outstanding.
+- Having a consistent philosophy and syntax makes it much easier to learn.
+- For data cleaning, wrangling and plotting... the tidyverse is really a no-brainer.&lt;sup&gt;1&lt;/sup&gt;
+
+.footnote[
+&lt;sup&gt;1&lt;/sup&gt; I should say that I'm also a fan of the [data.table](https://github.com/Rdatatable/data.table/wiki) package for data work. I may come back to this package once we reach the big data section of the course.
+]
+
+--
+
+But this certainly shouldn't put you off learning base R alternatives.
+- Base R is extremely flexible and powerful (esp. when combined with other libraries).
+- There are some things that you'll have to venture outside of the tidyverse for.
+- A combination of tidyverse and base R is often the best solution to a problem.
+
+---
+
+# Tidyverse vs. base R (cont.)
+
+One point of convenience is that there is often a direct correspondence between a tidyverse command and its base R equivalent. 
+
+These invariably follow a `tidyverse::snake_case` vs `base::period.case` rule. E.g. see:
+- `?readr::read_csv` vs `?utils::read.csv`
+- `?tibble::data_frame`vs `?base::data.frame`
+- `?dplyr::if_else` vs `?base::ifelse`
+- etc.
+  
+If you call up the above examples, you'll see that the tidyverse alternative typically offers some enhancements or other useful options (and sometimes restrictions) over its base counterpart.
+- Remember: There are always many ways to achieve a single goal in R.
+
+---
+
+# Tidyverse packages
+
+Let's load the tidyverse meta-package and check the output.
+
+```r
+library(tidyverse)
+```
+
+--
+
+We see that we have actually loaded a number of packages (which could also be loaded individually): `ggplot2`, `tibble`, `dplyr`, etc.
+- We can also see information about the package versions and some namespace conflicts (remember those from last week).
+
+---
+
+# Tidyverse packages (cont.)
+
+The tidyverse actually comes with a lot more packages than those that are just loaded automatically.&lt;sup&gt;1&lt;/sup&gt;
+
+```r
+tidyverse_packages()
+```
+
+```
+##  [1] "broom"       "cli"         "crayon"      "dplyr"       "dbplyr"     
+##  [6] "forcats"     "ggplot2"     "haven"       "hms"         "httr"       
+## [11] "jsonlite"    "lubridate"   "magrittr"    "modelr"      "purrr"      
+## [16] "readr"       "readxl\n(&gt;=" "reprex"      "rlang"       "rstudioapi" 
+## [21] "rvest"       "stringr"     "tibble"      "tidyr"       "xml2"       
+## [26] "tidyverse"
+```
+
+We'll use several of these additional packages during the remainder of this course.
+— E.g. The `lubridate` package for working with dates and the `rvest` package for webscraping.
+- However, bear in mind that these packages will have to be loaded separately.
+
+.footnote[
+&lt;sup&gt;1&lt;/sup&gt; It also includes a lot of dependencies upon installation.
+]
+
+---
+
+# Tidyverse packages (cont.)
+
+I hope to cover most of the tidyverse packages over the length of this course.
+
+Today, however, I'm only really going to focus on two packages: 
+1. `dplyr`
+2. `tidyr`
+
+These are the workhorse packages for cleaning and wrangling data. They are thus the ones that you will likely make the most use of (alongside `ggplot2`, which we already met back in Lecture 1).
+- Data cleaning and wrangling occupies an inordinate amount of time, no matter where you are in your research career.
+
+---
+
+# An aside on pipes: %&gt;%
+
+We already learned about pipes in our lecture on the bash shell. In R, the pipe operator is denoted `%&gt;%` and is automatically loaded with the tidyverse.
+  
+I want to reiterate how cool pipes are, and how using them can dramatically improve the experience of reading and writing code. Compare:
+
+
+```r
+## These next two lines of code do exactly the same thing.
+mpg %&gt;% filter(manufacturer=="audi") %&gt;% group_by(model) %&gt;% summarise(hwy_mean = mean(hwy))
+summarise(group_by(filter(mpg, manufacturer=="audi"), model), hwy_mean = mean(hwy))
+```
+
+--
+
+The first line reads from left to right, exactly how I thought of the operations in my head. 
+- Take this object (mpg), do this (filter), then do this (group by), etc.
+
+The second line totally inverts this logical order (the final operation comes first!) 
+- Who wants to read things inside out?
+
+---
+
+# An aside on pipes: %&gt;% (cont.)
+
+The piped version of the code is even more readable if we write it over several lines. Here it is again and, this time, I'll run it for good measure so you can see the output:
+
+
+```r
+mpg %&gt;% 
+  filter(manufacturer=="audi") %&gt;% 
+  group_by(model) %&gt;% 
+  summarise(hwy_mean = mean(hwy))
+```
+
+```
+## # A tibble: 3 x 2
+##   model      hwy_mean
+##   &lt;chr&gt;         &lt;dbl&gt;
+## 1 a4             28.3
+## 2 a4 quattro     25.8
+## 3 a6 quattro     24
+```
+
+Remember: Using vertical space costs nothing and makes for much more readable/writeable code than cramming things horizontally.
+
+--
+
+PS — The pipe is originally from the [magrittr](https://magrittr.tidyverse.org/) package ([geddit?](https://en.wikipedia.org/wiki/The_Treachery_of_Images)), which can do some other cool things if you're inclined to explore.
+
+
+---
+class: inverse, center, middle
+name: dplyr
+
+# dplyr
+
+&lt;html&gt;&lt;div style='float:left'&gt;&lt;/div&gt;&lt;hr color='#EB811B' size=1px width=796px&gt;&lt;/html&gt;
+
+---
+
+# Key dplyr verbs
+
+There are five key dplyr verbs that you need to learn.
+
+1. `filter()`: Filter (i.e. subset) rows based on their values.
+
+2. `arrange()`: Arrange (i.e. reorder) rows based on their values.
+
+3. `select()`: Select (i.e. subset) columns by their names: 
+
+4. `mutate()`: Create new columns.
+
+5. `summarise()`: Collapse multiple rows into a single summary value.&lt;sup&gt;1&lt;/sup&gt;
+
+.footnote[
+&lt;sup&gt;1&lt;/sup&gt; `summarize()` with a "z" works too. R doesn't discriminate against uncivilised nations of the world.
+]
+
+--
+
+&lt;/br&gt;
+
+Let's practice these commands together using the starwars data frame that comes pre-packaged with `dplyr`. 
+
+---
+
+# 1) dplyr::filter()
+
+We can chain multiple filter commands with the pipe (`%&gt;%`), or just separate them within a single filter command using commas.
+
+```r
+starwars %&gt;% 
+  filter( 
+    species == "Human", 
+    height &gt;= 190
+    ) 
+```
+
+```
+## # A tibble: 4 x 13
+##   name  height  mass hair_color skin_color eye_color birth_year gender
+##   &lt;chr&gt;  &lt;int&gt; &lt;dbl&gt; &lt;chr&gt;      &lt;chr&gt;      &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt; 
+## 1 Dart~    202   136 none       white      yellow          41.9 male  
+## 2 Qui-~    193    89 brown      fair       blue            92   male  
+## 3 Dooku    193    80 white      fair       brown          102   male  
+## 4 Bail~    191    NA black      tan        brown           67   male  
+## # ... with 5 more variables: homeworld &lt;chr&gt;, species &lt;chr&gt;, films &lt;list&gt;,
+## #   vehicles &lt;list&gt;, starships &lt;list&gt;
+```
+
+---
+
+# 1) dplyr::filter() *cont.*
+
+Regular expressions work well too.
+
+```r
+starwars %&gt;% 
+  filter(grepl("Skywalker", name))
+```
+
+```
+## # A tibble: 3 x 13
+##   name  height  mass hair_color skin_color eye_color birth_year gender
+##   &lt;chr&gt;  &lt;int&gt; &lt;dbl&gt; &lt;chr&gt;      &lt;chr&gt;      &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt; 
+## 1 Luke~    172    77 blond      fair       blue            19   male  
+## 2 Anak~    188    84 blond      fair       blue            41.9 male  
+## 3 Shmi~    163    NA black      fair       brown           72   female
+## # ... with 5 more variables: homeworld &lt;chr&gt;, species &lt;chr&gt;, films &lt;list&gt;,
+## #   vehicles &lt;list&gt;, starships &lt;list&gt;
+```
+
+---
+
+# 1) dplyr::filter() *cont.*
+
+A very common `filter()` use case is identifying (or removing) missing data cases. 
+
+```r
+starwars %&gt;% 
+  filter(is.na(height))
+```
+
+```
+## # A tibble: 6 x 13
+##   name  height  mass hair_color skin_color eye_color birth_year gender
+##   &lt;chr&gt;  &lt;int&gt; &lt;dbl&gt; &lt;chr&gt;      &lt;chr&gt;      &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt; 
+## 1 Arve~     NA    NA brown      fair       brown             NA male  
+## 2 Finn      NA    NA black      dark       dark              NA male  
+## 3 Rey       NA    NA brown      light      hazel             NA female
+## 4 Poe ~     NA    NA brown      light      brown             NA male  
+## 5 BB8       NA    NA none       none       black             NA none  
+## 6 Capt~     NA    NA unknown    unknown    unknown           NA female
+## # ... with 5 more variables: homeworld &lt;chr&gt;, species &lt;chr&gt;, films &lt;list&gt;,
+## #   vehicles &lt;list&gt;, starships &lt;list&gt;
+```
+
+--
+
+&lt;/br&gt;
+
+To remove missing observations, simply use negation: `filter(!is.na(height))`. Try this yourself.
+
+---
+
+# 2) dplyr::arrange()
+
+
+```r
+starwars %&gt;% 
+  arrange(birth_year)
+```
+
+```
+## # A tibble: 87 x 13
+##    name  height  mass hair_color skin_color eye_color birth_year gender
+##    &lt;chr&gt;  &lt;int&gt; &lt;dbl&gt; &lt;chr&gt;      &lt;chr&gt;      &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt; 
+##  1 Wick~     88  20   brown      brown      brown            8   male  
+##  2 IG-88    200 140   none       metal      red             15   none  
+##  3 Luke~    172  77   blond      fair       blue            19   male  
+##  4 Leia~    150  49   brown      light      brown           19   female
+##  5 Wedg~    170  77   brown      fair       hazel           21   male  
+##  6 Plo ~    188  80   none       orange     black           22   male  
+##  7 Bigg~    183  84   black      light      brown           24   male  
+##  8 Han ~    180  80   brown      fair       brown           29   male  
+##  9 Land~    177  79   black      dark       brown           31   male  
+## 10 Boba~    183  78.2 black      fair       brown           31.5 male  
+## # ... with 77 more rows, and 5 more variables: homeworld &lt;chr&gt;,
+## #   species &lt;chr&gt;, films &lt;list&gt;, vehicles &lt;list&gt;, starships &lt;list&gt;
+```
+
+--
+
+*Note.* Arranging on a character-based column (i.e. strings) will sort alphabetically. Try this yourself by arranging according to the "name" column.
+
+---
+
+# 2) dplyr::arrange() *cont.*
+
+We can also arrange items in descending order using `arrange(desc())`.
+
+```r
+starwars %&gt;% 
+  arrange(desc(birth_year))
+```
+
+```
+## # A tibble: 87 x 13
+##    name  height  mass hair_color skin_color eye_color birth_year gender
+##    &lt;chr&gt;  &lt;int&gt; &lt;dbl&gt; &lt;chr&gt;      &lt;chr&gt;      &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt; 
+##  1 Yoda      66    17 white      green      brown            896 male  
+##  2 Jabb~    175  1358 &lt;NA&gt;       green-tan~ orange           600 herma~
+##  3 Chew~    228   112 brown      unknown    blue             200 male  
+##  4 C-3PO    167    75 &lt;NA&gt;       gold       yellow           112 &lt;NA&gt;  
+##  5 Dooku    193    80 white      fair       brown            102 male  
+##  6 Qui-~    193    89 brown      fair       blue              92 male  
+##  7 Ki-A~    198    82 white      pale       yellow            92 male  
+##  8 Fini~    170    NA blond      fair       blue              91 male  
+##  9 Palp~    170    75 grey       pale       yellow            82 male  
+## 10 Clie~    183    NA brown      fair       blue              82 male  
+## # ... with 77 more rows, and 5 more variables: homeworld &lt;chr&gt;,
+## #   species &lt;chr&gt;, films &lt;list&gt;, vehicles &lt;list&gt;, starships &lt;list&gt;
+```
+
+---
+
+# 3) dplyr::select()
+
+Use commas to select multiple columns out of a data frame. (You can also use "first:last" for consecutive columns). Deselect a column with "-".
+
+```r
+starwars %&gt;% 
+  select(name:skin_color, species, -height)
+```
+
+```
+## # A tibble: 87 x 5
+##    name                mass hair_color    skin_color  species
+##    &lt;chr&gt;              &lt;dbl&gt; &lt;chr&gt;         &lt;chr&gt;       &lt;chr&gt;  
+##  1 Luke Skywalker        77 blond         fair        Human  
+##  2 C-3PO                 75 &lt;NA&gt;          gold        Droid  
+##  3 R2-D2                 32 &lt;NA&gt;          white, blue Droid  
+##  4 Darth Vader          136 none          white       Human  
+##  5 Leia Organa           49 brown         light       Human  
+##  6 Owen Lars            120 brown, grey   light       Human  
+##  7 Beru Whitesun lars    75 brown         light       Human  
+##  8 R5-D4                 32 &lt;NA&gt;          white, red  Droid  
+##  9 Biggs Darklighter     84 black         light       Human  
+## 10 Obi-Wan Kenobi        77 auburn, white fair        Human  
+## # ... with 77 more rows
+```
+
+---
+
+# 3) dplyr::select() *cont.*
+
+You can also rename some (or all) of your selected variables in place.
+
+```r
+starwars %&gt;%
+  select(alias=name, crib=homeworld, sex=gender) 
+```
+
+```
+## # A tibble: 87 x 3
+##    alias              crib     sex   
+##    &lt;chr&gt;              &lt;chr&gt;    &lt;chr&gt; 
+##  1 Luke Skywalker     Tatooine male  
+##  2 C-3PO              Tatooine &lt;NA&gt;  
+##  3 R2-D2              Naboo    &lt;NA&gt;  
+##  4 Darth Vader        Tatooine male  
+##  5 Leia Organa        Alderaan female
+##  6 Owen Lars          Tatooine male  
+##  7 Beru Whitesun lars Tatooine female
+##  8 R5-D4              Tatooine &lt;NA&gt;  
+##  9 Biggs Darklighter  Tatooine male  
+## 10 Obi-Wan Kenobi     Stewjon  male  
+## # ... with 77 more rows
+```
+
+---
+
+# 3) dplyr::select() *cont.*
+
+The `select(contains(PATTERN))` option provides a nice shortcut in relevant cases.
+
+```r
+starwars %&gt;% 
+  select(name, contains("color"))
+```
+
+```
+## # A tibble: 87 x 4
+##    name               hair_color    skin_color  eye_color
+##    &lt;chr&gt;              &lt;chr&gt;         &lt;chr&gt;       &lt;chr&gt;    
+##  1 Luke Skywalker     blond         fair        blue     
+##  2 C-3PO              &lt;NA&gt;          gold        yellow   
+##  3 R2-D2              &lt;NA&gt;          white, blue red      
+##  4 Darth Vader        none          white       yellow   
+##  5 Leia Organa        brown         light       brown    
+##  6 Owen Lars          brown, grey   light       blue     
+##  7 Beru Whitesun lars brown         light       blue     
+##  8 R5-D4              &lt;NA&gt;          white, red  red      
+##  9 Biggs Darklighter  black         light       brown    
+## 10 Obi-Wan Kenobi     auburn, white fair        blue-gray
+## # ... with 77 more rows
+```
+
+---
+
+# 3) dplyr::select() *cont.*
+
+The `select(..., everything())` option is another useful shortcut if you only want to bring some variable(s) to the "front" of a data frame.
+
+
+```r
+starwars %&gt;% 
+  select(species, homeworld, everything())
+```
+
+```
+## # A tibble: 87 x 13
+##    species homeworld name  height  mass hair_color skin_color eye_color
+##    &lt;chr&gt;   &lt;chr&gt;     &lt;chr&gt;  &lt;int&gt; &lt;dbl&gt; &lt;chr&gt;      &lt;chr&gt;      &lt;chr&gt;    
+##  1 Human   Tatooine  Luke~    172    77 blond      fair       blue     
+##  2 Droid   Tatooine  C-3PO    167    75 &lt;NA&gt;       gold       yellow   
+##  3 Droid   Naboo     R2-D2     96    32 &lt;NA&gt;       white, bl~ red      
+##  4 Human   Tatooine  Dart~    202   136 none       white      yellow   
+##  5 Human   Alderaan  Leia~    150    49 brown      light      brown    
+##  6 Human   Tatooine  Owen~    178   120 brown, gr~ light      blue     
+##  7 Human   Tatooine  Beru~    165    75 brown      light      blue     
+##  8 Droid   Tatooine  R5-D4     97    32 &lt;NA&gt;       white, red red      
+##  9 Human   Tatooine  Bigg~    183    84 black      light      brown    
+## 10 Human   Stewjon   Obi-~    182    77 auburn, w~ fair       blue-gray
+## # ... with 77 more rows, and 5 more variables: birth_year &lt;dbl&gt;,
+## #   gender &lt;chr&gt;, films &lt;list&gt;, vehicles &lt;list&gt;, starships &lt;list&gt;
+```
+
+---
+
+# 4) dplyr::mutate()
+
+You can create new columns from scratch, or (more commonly) as transformations of existing columns.
+
+```r
+starwars %&gt;% 
+  select(name, birth_year) %&gt;%
+  mutate(dog_years = birth_year * 7) %&gt;%
+  mutate(comment = paste0(name, " is ", dog_years, " in dog years."))
+```
+
+```
+## # A tibble: 87 x 4
+##    name             birth_year dog_years comment                           
+##    &lt;chr&gt;                 &lt;dbl&gt;     &lt;dbl&gt; &lt;chr&gt;                             
+##  1 Luke Skywalker         19        133  Luke Skywalker is 133 in dog year~
+##  2 C-3PO                 112        784  C-3PO is 784 in dog years.        
+##  3 R2-D2                  33        231  R2-D2 is 231 in dog years.        
+##  4 Darth Vader            41.9      293. Darth Vader is 293.3 in dog years.
+##  5 Leia Organa            19        133  Leia Organa is 133 in dog years.  
+##  6 Owen Lars              52        364  Owen Lars is 364 in dog years.    
+##  7 Beru Whitesun l~       47        329  Beru Whitesun lars is 329 in dog ~
+##  8 R5-D4                  NA         NA  R5-D4 is NA in dog years.         
+##  9 Biggs Darklight~       24        168  Biggs Darklighter is 168 in dog y~
+## 10 Obi-Wan Kenobi         57        399  Obi-Wan Kenobi is 399 in dog year~
+## # ... with 77 more rows
+```
+
+---
+
+
+# 4) dplyr::mutate() *cont*
+
+*Note:* `mutate()` is order aware. So you can chain multiple mutates in a single call.
+
+```r
+starwars %&gt;% 
+  select(name, birth_year) %&gt;%
+  mutate(
+    dog_years = birth_year * 7, ## Separate with a comma
+    comment = paste0(name, " is ", dog_years, " in dog years.")
+    )
+```
+
+```
+## # A tibble: 87 x 4
+##    name             birth_year dog_years comment                           
+##    &lt;chr&gt;                 &lt;dbl&gt;     &lt;dbl&gt; &lt;chr&gt;                             
+##  1 Luke Skywalker         19        133  Luke Skywalker is 133 in dog year~
+##  2 C-3PO                 112        784  C-3PO is 784 in dog years.        
+##  3 R2-D2                  33        231  R2-D2 is 231 in dog years.        
+##  4 Darth Vader            41.9      293. Darth Vader is 293.3 in dog years.
+##  5 Leia Organa            19        133  Leia Organa is 133 in dog years.  
+##  6 Owen Lars              52        364  Owen Lars is 364 in dog years.    
+##  7 Beru Whitesun l~       47        329  Beru Whitesun lars is 329 in dog ~
+##  8 R5-D4                  NA         NA  R5-D4 is NA in dog years.         
+##  9 Biggs Darklight~       24        168  Biggs Darklighter is 168 in dog y~
+## 10 Obi-Wan Kenobi         57        399  Obi-Wan Kenobi is 399 in dog year~
+## # ... with 77 more rows
+```
+
+---
+
+# 4) dplyr::mutate() *cont.*
+
+Boolean, logical and conditional operators all work well with `mutate()` too.
+
+```r
+starwars %&gt;% 
+  select(name, height) %&gt;%
+  filter(name %in% c("Luke Skywalker", "Anakin Skywalker")) %&gt;% 
+  mutate(tall1 = height &gt; 180) %&gt;%
+  mutate(tall2 = ifelse(height &gt; 180, "Tall", "Short")) ## Same effect, but can choose labels
+```
+
+```
+## # A tibble: 2 x 4
+##   name             height tall1 tall2
+##   &lt;chr&gt;             &lt;int&gt; &lt;lgl&gt; &lt;chr&gt;
+## 1 Luke Skywalker      172 FALSE Short
+## 2 Anakin Skywalker    188 TRUE  Tall
+```
+
+---
+
+# 4) dplyr::mutate() *cont.*
+
+Lastly, there are "scoped" variants of `mutate()` that work on a subset of variables.
+- `mutate_all()` affects every variable
+- `mutate_at()` affects named or selected variables
+- `mutate_if()` affects variables that meet some criteria (e.g. are numeric)
+
+A silly example using the latter:
+
+
+```r
+starwars %&gt;% select(name:eye_color) %&gt;% mutate_if(is.character, toupper) %&gt;% head(5)
+```
+
+```
+## # A tibble: 5 x 6
+##   name           height  mass hair_color skin_color  eye_color
+##   &lt;chr&gt;           &lt;int&gt; &lt;dbl&gt; &lt;chr&gt;      &lt;chr&gt;       &lt;chr&gt;    
+## 1 LUKE SKYWALKER    172    77 BLOND      FAIR        BLUE     
+## 2 C-3PO             167    75 &lt;NA&gt;       GOLD        YELLOW   
+## 3 R2-D2              96    32 &lt;NA&gt;       WHITE, BLUE RED      
+## 4 DARTH VADER       202   136 NONE       WHITE       YELLOW   
+## 5 LEIA ORGANA       150    49 BROWN      LIGHT       BROWN
+```
+
+--
+
+See `?mutate_all` for more details and examples.
+
+---
+
+# 5) dplyr::summarise()
+
+Particularly useful in combination with the `group_by()` command.
+
+```r
+starwars %&gt;% 
+  group_by(species, gender) %&gt;% 
+  summarise(mean_height = mean(height, na.rm = T))
+```
+
+```
+## # A tibble: 43 x 3
+## # Groups:   species [38]
+##    species   gender mean_height
+##    &lt;chr&gt;     &lt;chr&gt;        &lt;dbl&gt;
+##  1 Aleena    male            79
+##  2 Besalisk  male           198
+##  3 Cerean    male           198
+##  4 Chagrian  male           196
+##  5 Clawdite  female         168
+##  6 Droid     none           200
+##  7 Droid     &lt;NA&gt;           120
+##  8 Dug       male           112
+##  9 Ewok      male            88
+## 10 Geonosian male           183
+## # ... with 33 more rows
+```
+
+---
+
+# 5) dplyr::summarise() *cont.*
+
+Note that including "na.rm = T" is usually a good idea with summarise functions. Otherwise, any missing value will propogate to the summarised value too.
+
+```r
+## Probably not what we want
+starwars %&gt;% 
+  summarise(mean_height = mean(height))
+```
+
+```
+## # A tibble: 1 x 1
+##   mean_height
+##         &lt;dbl&gt;
+## 1          NA
+```
+
+```r
+## Much better
+starwars %&gt;% 
+  summarise(mean_height = mean(height, na.rm = T))
+```
+
+```
+## # A tibble: 1 x 1
+##   mean_height
+##         &lt;dbl&gt;
+## 1        174.
+```
+
+---
+
+# 4) dplyr::summarise() *cont.*
+
+The "scoped" variants that we saw earlier also work with `summarise()`
+- `summarise_all()` affects every variable
+- `summarise_at()` affects named or selected variables
+- `summarise_if()` affects variables that meet some criteria (e.g. are numeric)
+
+An example using the latter:
+
+
+```r
+starwars %&gt;% group_by(species, gender) %&gt;% summarise_if(is.numeric, funs(avg=mean), na.rm=T) %&gt;% head(5)
+```
+
+```
+## Warning: funs() is soft deprecated as of dplyr 0.8.0
+## Please use a list of either functions or lambdas: 
+## 
+##   # Simple named list: 
+##   list(mean = mean, median = median)
+## 
+##   # Auto named with `tibble::lst()`: 
+##   tibble::lst(mean, median)
+## 
+##   # Using lambdas
+##   list(~ mean(., trim = .2), ~ median(., na.rm = TRUE))
+## This warning is displayed once per session.
+```
+
+```
+## # A tibble: 5 x 5
+## # Groups:   species [5]
+##   species  gender height_avg mass_avg birth_year_avg
+##   &lt;chr&gt;    &lt;chr&gt;       &lt;dbl&gt;    &lt;dbl&gt;          &lt;dbl&gt;
+## 1 Aleena   male           79       15            NaN
+## 2 Besalisk male          198      102            NaN
+## 3 Cerean   male          198       82             92
+## 4 Chagrian male          196      NaN            NaN
+## 5 Clawdite female        168       55            NaN
+```
+
+--
+
+Again, see `?summarise_at` for more details and examples.
+
+---
+
+# Other dplyr goodies
+
+`group_by()` and `ungroup()`: For (un)grouping.
+- Particularly useful with the `summarise()` and `mutate()` commands, as we've already seen.
+
+--
+
+`slice()`: Subset rows by position rather than filtering by values.
+- E.g. `starwars %&gt;% slice(c(1, 5))`
+
+--
+
+`pull()`: Extract a column from as a data frame as a vector or scalar.
+- E.g. `starwars %&gt;% filter(gender=="female") %&gt;% pull(height)`
+
+--
+
+`count()` and `distinct()`: Number and isolate unique observations.
+- E.g. `starwars %&gt;% count(species)`, or `starwars %&gt;% distinct(species)`
+- You could also use a combination of `mutate()`, `group_by()`, and `n()`, e.g. `starwars %&gt;% group_by(species) %&gt;% mutate(num = n())`.
+
+
+---
+
+# Other dplyr goodies (cont.)
+
+There are also a whole class of [window functions](https://cran.r-project.org/web/packages/dplyr/vignettes/window-functions.html) for getting leads and lags, ranking, creating cumulative aggregates, etc.
+- See `vignette("window-functions")`.
+
+--
+
+&lt;/br&gt;
+
+The final set of dplyr "goodies" are the family of join operations. However, these are important enough that I want to go over some concepts in a bit more depth...
+- We encounter and practice these many more times as the course progresses.
+
+# Many Thanks!
+
+Slides created via the R package [**xaringan**](https://github.com/yihui/xaringan).
+
+The chakra comes from [remark.js](https://remarkjs.com), [**knitr**](http://yihui.name/knitr), and [R Markdown](https://rmarkdown.rstudio.com).
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();</script>
+
+<script>
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
